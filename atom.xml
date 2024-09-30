@@ -8,11 +8,32 @@
     <author>
       <name>Jongsh</name>
     </author>
-    <updated>2024-09-10T12:40:21.000Z</updated>
+    <updated>2024-10-01T05:14:06.000Z</updated>
     <category term="穷拾" />
     <category term=" jongsh" />
     <category term=" 博客" />
     <category term=" blog" />
+    <entry>
+        <id>https://blog.jongsh.top/learning-note/frontend-development/01-Vue3%E9%A1%B9%E7%9B%AE%E6%9E%84%E5%BB%BA%E6%8C%87%E5%8D%97/</id>
+        <title>Vue3 项目构建指南</title>
+        <link rel="alternate" href="https://blog.jongsh.top/learning-note/frontend-development/01-Vue3%E9%A1%B9%E7%9B%AE%E6%9E%84%E5%BB%BA%E6%8C%87%E5%8D%97/"/>
+        <content type="html">&lt;p&gt;在前端开发领域，Vue 框架无疑是一个重要的角色。然而，每次创建和初始化 Vue 项目时，我总是要一边查阅文档和浏览器一边配置。这主要是因为为了完整地初始化一个 Vue 项目，往往需要考虑其他组件的使用和配置等细节。因此，我写下这篇博客，主要是依据我个人的开发习惯，整理了 Vue3 项目的构建和配置流程，望一劳永逸～&lt;/p&gt;
+&lt;h2 id=&#34;一-基本配置&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#一-基本配置&#34;&gt;#&lt;/a&gt; 一、基本配置&lt;/h2&gt;
+&lt;h3 id=&#34;11-概述&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#11-概述&#34;&gt;#&lt;/a&gt; 1.1 概述&lt;/h3&gt;
+&lt;p&gt;本项目的技术栈 本项目技术栈基于 &lt;a href=&#34;http://es6.ruanyifeng.com/&#34;&gt;ES6&lt;/a&gt;、&lt;a href=&#34;https://cn.vuejs.org/index.html&#34;&gt;vue3&lt;/a&gt;、&lt;a href=&#34;https://pinia.web3doc.top/&#34;&gt;pinia&lt;/a&gt;、&lt;a href=&#34;https://router.vuejs.org/&#34;&gt;vue-router&lt;/a&gt; 、vite 、axios 和 [element-plus](&lt;/p&gt;
+&lt;p&gt;依据我个人习惯，给出我构建 Vue3 项目时的环境和工具选择。&lt;/p&gt;
+&lt;p&gt;包管理器：常见的包管理器有 npm、yarn 和 pnpm，使用哪一个都可以方便地满足 Vue 项目的构建和开发需求。对于我个人而言，更偏向于选择使用 pnpm 来管理 JavaScript 包，原因很简单，一个字 —— 快，可以参考这篇&lt;a href=&#34;https://blog.csdn.net/qq_23730073/article/details/135850470&#34;&gt;博客&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;使用 pnpm，首先需要全局安装，命令如下：&lt;/p&gt;
+&lt;figure class=&#34;highlight bash&#34;&gt;&lt;figcaption data-lang=&#34;bash&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token function&#34;&gt;npm&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;install&lt;/span&gt; &lt;span class=&#34;token parameter variable&#34;&gt;-g&lt;/span&gt; &lt;span class=&#34;token function&#34;&gt;pnpm&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;安装后，就可以在项目中使用 pnpm 命令来代替 npm 命令了。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://element-plus.org/&#34;&gt;https://element-plus.org/&lt;/a&gt;)&lt;/p&gt;
+&lt;h3 id=&#34;12-配置流程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#12-配置流程&#34;&gt;#&lt;/a&gt; 1.2 配置流程&lt;/h3&gt;
+&lt;br&gt;
+&lt;h2 id=&#34;二-外部组件&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#二-外部组件&#34;&gt;#&lt;/a&gt; 二、外部组件&lt;/h2&gt;
+</content>
+        <category term="学习笔记" scheme="https://blog.jongsh.top/categories/learning-note/" />
+        <category term="前端开发" scheme="https://blog.jongsh.top/categories/learning-note/frontend-development/" />
+        <updated>2024-10-01T05:14:06.000Z</updated>
+    </entry>
     <entry>
         <id>https://blog.jongsh.top/announcement/</id>
         <title>网站迁移完成</title>

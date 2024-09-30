@@ -7,6 +7,17 @@
     "home_page_url": "https://blog.jongsh.top",
     "items": [
         {
+            "id": "https://blog.jongsh.top/learning-note/frontend-development/01-Vue3%E9%A1%B9%E7%9B%AE%E6%9E%84%E5%BB%BA%E6%8C%87%E5%8D%97/",
+            "url": "https://blog.jongsh.top/learning-note/frontend-development/01-Vue3%E9%A1%B9%E7%9B%AE%E6%9E%84%E5%BB%BA%E6%8C%87%E5%8D%97/",
+            "title": "Vue3 项目构建指南",
+            "date_published": "2024-10-01T05:14:06.000Z",
+            "content_html": "<p>在前端开发领域，Vue 框架无疑是一个重要的角色。然而，每次创建和初始化 Vue 项目时，我总是要一边查阅文档和浏览器一边配置。这主要是因为为了完整地初始化一个 Vue 项目，往往需要考虑其他组件的使用和配置等细节。因此，我写下这篇博客，主要是依据我个人的开发习惯，整理了 Vue3 项目的构建和配置流程，望一劳永逸～</p>\n<h2 id=\"一-基本配置\"><a class=\"anchor\" href=\"#一-基本配置\">#</a> 一、基本配置</h2>\n<h3 id=\"11-概述\"><a class=\"anchor\" href=\"#11-概述\">#</a> 1.1 概述</h3>\n<p>本项目的技术栈 本项目技术栈基于 <a href=\"http://es6.ruanyifeng.com/\">ES6</a>、<a href=\"https://cn.vuejs.org/index.html\">vue3</a>、<a href=\"https://pinia.web3doc.top/\">pinia</a>、<a href=\"https://router.vuejs.org/\">vue-router</a> 、vite 、axios 和 [element-plus](</p>\n<p>依据我个人习惯，给出我构建 Vue3 项目时的环境和工具选择。</p>\n<p>包管理器：常见的包管理器有 npm、yarn 和 pnpm，使用哪一个都可以方便地满足 Vue 项目的构建和开发需求。对于我个人而言，更偏向于选择使用 pnpm 来管理 JavaScript 包，原因很简单，一个字 —— 快，可以参考这篇<a href=\"https://blog.csdn.net/qq_23730073/article/details/135850470\">博客</a>。</p>\n<p>使用 pnpm，首先需要全局安装，命令如下：</p>\n<figure class=\"highlight bash\"><figcaption data-lang=\"bash\"></figcaption><table><tr><td data-num=\"1\"></td><td><pre><span class=\"token function\">npm</span> <span class=\"token function\">install</span> <span class=\"token parameter variable\">-g</span> <span class=\"token function\">pnpm</span></pre></td></tr></table></figure><p>安装后，就可以在项目中使用 pnpm 命令来代替 npm 命令了。</p>\n<p><a href=\"https://element-plus.org/\">https://element-plus.org/</a>)</p>\n<h3 id=\"12-配置流程\"><a class=\"anchor\" href=\"#12-配置流程\">#</a> 1.2 配置流程</h3>\n<br>\n<h2 id=\"二-外部组件\"><a class=\"anchor\" href=\"#二-外部组件\">#</a> 二、外部组件</h2>\n",
+            "tags": [
+                "学习笔记",
+                "前端开发"
+            ]
+        },
+        {
             "id": "https://blog.jongsh.top/announcement/",
             "url": "https://blog.jongsh.top/announcement/",
             "title": "网站迁移完成",
