@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#222"><meta http-equiv="X-UA-COMPATIBLE" content="IE=edge,chrome=1"><meta name="renderer" content="webkit"><link rel="icon" type="image/ico" sizes="32x32" href="/assets/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"><link rel="alternate" href="/rss.xml" title="穷拾の小屋" type="application/rss+xml"><link rel="alternate" href="/atom.xml" title="穷拾の小屋" type="application/atom+xml"><link rel="alternate" type="application/json" title="穷拾の小屋" href="https://blog.jongsh.top/feed.json"><link rel="preconnect" href="https://s4.zstatic.net"><link rel="preconnect" href="https://at.alicdn.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7CFredericka%20the%20Great:400,400italic,700,700italic%7CNoto%20Serif%20JP:400,400italic,700,700italic%7CNoto%20Serif%20SC:400,400italic,700,700italic%7CInconsolata:400,400italic,700,700italic&amp;display=swap&amp;subset=latin,latin-ext" media="none" onload="this.media='all'"><link rel="stylesheet" href="/css/app.css?v=0.4.25"><link rel="modulepreload" href="/js/chunk-3DLRVTZI.js"><link rel="modulepreload" href="/js/chunk-G6WST2TT.js"><link rel="modulepreload" href="/js/chunk-MEQLBSIV.js"><link rel="modulepreload" href="/js/chunk-T4ZN27XU.js"><link rel="modulepreload" href="/js/chunk-WIQECBEN.js"><link rel="modulepreload" href="/js/comments-RAU2KDSH.js"><link rel="modulepreload" href="/js/copy-tex-JHKIWPSS.js"><link rel="modulepreload" href="/js/post-DEG2LM3E.js"><link rel="modulepreload" href="/js/quicklink-VPIEOOQW.js"><link rel="modulepreload" href="/js/search-7R35WZ2Q.js"><link rel="modulepreload" href="/js/siteInit.js"><link rel="modulepreload" href="/js/waline-MSCX2FFD.js"><link rel="stylesheet" href="/css/comments-F4ZGS7LD.css" media="none" onload="this.media='all'"><link rel="stylesheet" href="/css/siteInit.css" media="none" onload="this.media='all'"><link rel="stylesheet" href="/css/waline-IDNZKML2.css" media="none" onload="this.media='all'"><link rel="preload" href="https://jongsh.oss-cn-beijing.aliyuncs.com/blog/cover/202409060938769.jpg?x-oss-process=image/format,webp" as="image" fetchpriority="high"><meta name="keywords" content="穷拾, jongsh, 博客, blog"><meta name="description" content="Talk is cheap, show me the code!"><link rel="canonical" href="https://blog.jongsh.top/learning-note/server-configuration/linux-nfs-cifs/"><title>Linux 环境配置 NFS 与 CIFS</title><meta name="generator" content="Hexo 7.3.0"></head><body itemscope="" itemtype="http://schema.org/WebPage"><div id="loading"><div class="cat"><div class="body"></div><div class="head"><div class="face"></div></div><div class="foot"><div class="tummy-end"></div><div class="bottom"></div><div class="legs left"></div><div class="legs right"></div></div><div class="paw"><div class="hands left"></div><div class="hands right"></div></div></div></div><div id="container"><header id="header" itemscope="" itemtype="http://schema.org/WPHeader"><div class="inner"><div id="brand"><div class="pjax"><h1 itemprop="name headline">Linux 环境配置 NFS 与 CIFS</h1><div class="meta"><span class="item" title="创建时间：2024-07-16 10:01:28"><span class="icon"><i class="ic i-calendar"></i></span><span class="text">发表于</span><time itemprop="dateCreated datePublished" datetime="2024-07-16T10:01:28+08:00">2024-07-16</time></span><span class="item" title="本文字数"><span class="icon"><i class="ic i-pen"></i></span><span class="text">本文字数</span><span>8.4k</span><span class="text">字</span></span><span class="item" title="阅读时长"><span class="icon"><i class="ic i-clock"></i></span><span class="text">阅读时长</span><span>8 分钟</span></span></div></div></div><nav id="nav"><div class="inner"><div class="toggle"><div class="lines" aria-label="切换导航栏"><span class="line"></span><span class="line"></span><span class="line"></span></div></div><ul class="menu"><li class="item title"><a href="/" rel="start">JONGSH'S BLOG</a></li></ul><ul class="right" id="rightNav"><li class="item theme"><i class="ic i-sun"></i></li><li class="item search"><i class="ic i-search"></i></li></ul></div></nav></div><div class="pjax" id="imgs"><img src="https://jongsh.oss-cn-beijing.aliyuncs.com/blog/cover/202409060938769.jpg?x-oss-process=image/format,webp" loading="eager" decoding="async" fetchpriority="high" alt="穷拾の小屋"></div></header><div id="waves"><svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path></defs><g class="parallax"><use xlink:href="#gentle-wave" x="48" y="0"></use><use xlink:href="#gentle-wave" x="48" y="3"></use><use xlink:href="#gentle-wave" x="48" y="5"></use><use xlink:href="#gentle-wave" x="48" y="7"></use></g></svg></div><div id="main-background" style="background-image: url(https://jongsh.oss-cn-beijing.aliyuncs.com/blog/others/202409152212632.png?x-oss-process=image/format,webp); position: relative;">   <main><div class="inner"><div class="pjax" id="main"><div class="article wrap"><div class="breadcrumb" itemlistelement="" itemscope="" itemtype="https://schema.org/BreadcrumbList"><i class="ic i-home"></i><span><a href="/">首页</a></span><i class="ic i-angle-right"></i><span itemprop="itemListElement" itemscope="itemscope" itemtype="https://schema.org/ListItem"><a href="/categories/learning-note/" itemprop="item" rel="index" title="分类于学习笔记"><span itemprop="name">学习笔记<meta itemprop="position" content="0"></span></a></span><i class="ic i-angle-right"></i><span class="current" itemprop="itemListElement" itemscope="itemscope" itemtype="https://schema.org/ListItem"><a href="/categories/learning-note/server-configuration/" itemprop="item" rel="index" title="分类于服务器配置"><span itemprop="name">服务器配置<meta itemprop="position" content="1"></span></a></span></div><article class="post block" itemscope="itemscope" itemtype="http://schema.org/Article" lang="zh-CN"><link itemprop="mainEntityOfPage" href="https://blog.jongsh.top/learning-note/server-configuration/linux-nfs-cifs/"><span hidden="hidden" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><meta itemprop="image" content="/assets/avatar.jpg"><meta itemprop="name" content="Jongsh"><meta itemprop="description" content=", Talk is cheap, show me the code!"></span><span hidden="hidden" itemprop="publisher" itemscope="itemscope" itemtype="http://schema.org/Organization"><meta itemprop="name" content="穷拾の小屋"></span><div class="body md" itemprop="articleBody"><p>暑期实习两周，负责老师终于给我派了任务。闲来无事，遂写下这篇博客记录所学内容和踩过的坑。</p>
+<h2 id="概述"><a class="anchor" href="#概述">#</a> 概述</h2>
+<p>网络文件系统（NFS）最早是由 Sun 公司发展出来的，也是 FreeBSD 支持的文件系统中的一个，它允许网络中的计算机之间通过 TCP/IP 网络共享资源。通过 NFS，我们本地 NFS 的客户端应用可以透明地读写位于服务端 NFS 服务器上的文件，就像访问本地文件一样方便。简单的理解，NFS 就是可以透过网络，让不同的主机、不同的操作系统可以共享存储的服务。</p>
+<p>通用 Internet 文件系统（CIFS）最初由微软于 1990 年代中期发布，是服务器消息块（SMB）文件访问协议的扩展。CIFS 在 Windows 操作系统的网络环境中被广泛使用，但在现代系统实施中，更新版本的 SMB 已经取代了 CIFS。</p>
+<p>二者之间的一些对比和区别如下：</p>
+<ul>
+<li>CIFS 面向网络连接的共享协议，对网络传输的可靠性要求高，常使用 TCP/IP；NFS 是独立于传输的，可使用 TCP 或 UDP。</li>
+<li>NFS 共享资源的能力仅限于文件和目录。相比之下，CIFS 还可以提供与其他网络设备（例如打印机）的共享资源通信。</li>
+<li>NFS 和 CIFS 最初是针对不同的操作系统设计的。CIFS 针对的是 Windows 操作系统，NFS 则针对 Unix。这意味着这两种协议是为了利用各自的操作系统内核来实施最佳操作而构建的。虽然可以在基于 Linux 的操作系统中使用 CIFS（通过 Samba），在 Windows 操作系统上使用 NFS（通过第三方软件包），但这些不是原生支持的做法。</li>
+<li>NFS 传统上依赖于基于<strong>主机</strong>的身份验证，在这种身份验证中，<strong>对共享文件的访问是根据客户端计算机的 IP 地址或主机名来控制的</strong>。它的内置安全机制有限，这在开放网络中可能是一个问题。而 CIFS 提供了更高级的身份验证和安全功能。<strong>它支持基于用户的身份验证，因此个人用户可以使用其凭证访问共享资源</strong>。CIFS 还支持加密和其他安全机制，这使其更适合安全环境。</li>
+<li>NFS 采用无状态设计，这意味着它不会跟踪服务器上打开的文件。因此，文件锁定由客户端处理，当多个客户端尝试同时写入同一个文件时，就会发生冲突。CIFS 支持服务器端的文件锁定，当多个客户端访问同一个文件时，它可以更好地进行协调并避免冲突。</li>
+<li>在性能方面，NFS 使用开销更少的轻量级协议，从而加快文件访问和传输速度。相反，CIFS 支持各种特定于 Windows 的功能，因此协议开销更大。</li>
+</ul>
+<p>整理成表格如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">对比</th>
+<th style="text-align:center">NFS</th>
+<th style="text-align:center">CIFS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">当前版本</td>
+<td style="text-align:center">NFS 4</td>
+<td style="text-align:center">已被 SMB 版本 3.1.1 所取代</td>
+</tr>
+<tr>
+<td style="text-align:center">适合的操作系统</td>
+<td style="text-align:center">基于 Linux 的网络架构</td>
+<td style="text-align:center">需要时可用于基于 Windows 的传统架构</td>
+</tr>
+<tr>
+<td style="text-align:center">共享资源</td>
+<td style="text-align:center">文件或目录</td>
+<td style="text-align:center">文件、目录和网络资源</td>
+</tr>
+<tr>
+<td style="text-align:center">身份验证</td>
+<td style="text-align:center">基于 IP</td>
+<td style="text-align:center">基于用户</td>
+</tr>
+<tr>
+<td style="text-align:center">文件锁定</td>
+<td style="text-align:center">由客户处理</td>
+<td style="text-align:center">由服务器处理</td>
+</tr>
+<tr>
+<td style="text-align:center">性能</td>
+<td style="text-align:center">协议开销低，性能较快</td>
+<td style="text-align:center">协议开销高，性能较低</td>
+</tr>
+</tbody>
+</table>
+<p>当前，有个开发需求：由一台服务器提供磁盘，共享给另一台服务器使用。这篇博客就分别介绍使用 NFS 和 CIFS 如何进行配置。该需求用于两个 Linux/Unix 系统，因此在配置 CIFS 时需要使用到 Samba 服务。</p>
+<br> 
+<h2 id="准备工作"><a class="anchor" href="#准备工作">#</a> 准备工作</h2>
+<p>当前需求中的两台机器，提供磁盘存储的称为服务端，使用共享存储空间的称为客户端。整个流程梳理下来就是将服务端中的某一目录共享给客户端使用。</p>
+<p>如果当前服务端只有磁盘设备或文件系统，那么需要先挂在到某一目录下，这个目录就是需要共享的目录，这里设为  <code>/share</code> 。</p>
+<p><strong>将文件系统挂在到目录的方法如下</strong>：</p>
+<p>使用  <code>fdisk -l</code>  命令可以查看未挂载的磁盘或文件系统。</p>
+<p>一般来说，磁盘设备都会放到  <code>/dev</code>  目录下，在找到需要挂在的磁盘名后，可以到该目录下进行查找，找到对应的路径。这里比如设为  <code>/dev/sdg</code> 。这样就可以用下面的命令将磁盘挂在到需要共享的目录下：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">mount</span> /dev/sdg /share</pre></td></tr></tbody></table></figure><p>再用  <code>mount</code>  命令查看是否已经挂在成功。磁盘被手动挂载之后都必须把挂载信息写入  <code>/etc/fstab</code>  这个文件中，否则下次开机启动时仍然需要重新挂载。系统开机时会主动读取  <code>/etc/fstab</code>  这个文件中的内容，根据文件里面的配置挂载磁盘。这样只需要将磁盘的挂载信息写入这个文件中就可完成自动挂载。</p>
+<p>以一个已经挂载好的例子作展示：</p>
+<ul>
+<li>
+<p>首先通过  <code>blkid</code>  命令将需要挂在的设备 uuid 查询出来并复制（往  <code>/etc/fstab</code>  中追加挂载信息时建议使用 uuid）。</p>
+</li>
+<li>
+<p><code>vim /etc/fstab</code>  进入该文件进行修改，添加挂载信息。</p>
+<p><img loading="lazy" data-src="https://jongsh.oss-cn-beijing.aliyuncs.com/blog/content/202407/202407152052438.png?x-oss-process=image/format,webp" alt="文件系统挂载" title="文件系统挂载"></p>
+<p>关于  <code>/etc/fstab</code>  中的内容，可以分成六列参数：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>Device		Mount point		fileSystem		params		    dump		<span class="token function">fsck</span> </pre></td></tr><tr><td data-num="2"></td><td><pre>label 或 uuid   	挂载的目录	    文件系统格式    文件系统参数     <span class="token number">0</span>、1、2        <span class="token number">0</span>、1、2</pre></td></tr></tbody></table></figure><blockquote>
+<p>一般使用该设备 uuid，因为一旦磁盘插槽顺序发生变化，label 可能会改变，uuid 是不会变化的。</p>
+<p>文件系统格式可以用  <code>mount</code>  命令查看。</p>
+<p>文件系统参数可以查看参考资料，不清楚的情况下可以写  <code>defaults</code> 。</p>
+<p>最后两个参数分别表示 "能否被 dump 备份命令作用" 和 "是否检验扇区"，不清楚的情况下可以写  <code>0 0</code> 。</p>
+</blockquote>
+</li>
+</ul>
+<p>对于需要共享的目录，为了防止出现权限问题，可以设置最大权限：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">chmod</span> <span class="token parameter variable">-R</span> <span class="token number">777</span> /share</pre></td></tr></tbody></table></figure><p>共享文件设置完成后，客户端也要创建一个用于挂在共享目录的目录，这里设为  <code>/mnt/nfsmount</code>  和  <code>/mnt/smbmount</code> ，分别对于接下来要介绍的两种方法。</p>
+<p><em>注意，本博客的 Linux 环境是基于 Red Hat 的系统（如 CentOS 和 Fedora），而基于 Debian 的系统（如 Ubuntu）它们的命令语法和软件包更新方式有所不同，所以后续配置过程用到的部分命令，不同系统会有不一样的实现，甚至软件包都有的不一样，因此 Debian 系统的配置建议重新查阅专门的教程。</em></p>
+<br> 
+<h2 id="nfscifs-配置"><a class="anchor" href="#nfscifs-配置">#</a> NFS/CIFS 配置</h2>
+<p>这一节将分别对 NFS 和 CIFS (Samba) 的配置进行介绍。</p>
+<h3 id="nfs-配置"><a class="anchor" href="#nfs-配置">#</a> NFS 配置</h3>
+<p>NFS 服务端需要安装  <code>rpcbind</code>  和  <code>nfs-utils</code> ，客户端需要安装  <code>nfs-utils</code>  。</p>
+<p>首先在服务端系统确认是否已经安装 NFS（客户端相同）：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>$ <span class="token function">rpm</span> <span class="token parameter variable">-qa</span> nfs-utils rpcbind</pre></td></tr><tr><td data-num="2"></td><td><pre>nfs-utils-1.3.0-0.54.el7.x86_64</pre></td></tr><tr><td data-num="3"></td><td><pre>rpcbind-0.2.0-38.el7.x86_64</pre></td></tr></tbody></table></figure><p>如果没有输出，则分别在服务端和客户端进行安装：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>yum <span class="token function">install</span> <span class="token parameter variable">-y</span> nfs-utils rpcbind  <span class="token comment"># 服务端</span></pre></td></tr><tr><td data-num="2"></td><td><pre>yum <span class="token function">install</span> <span class="token parameter variable">-y</span> nfs-utils          <span class="token comment"># 客户端</span></pre></td></tr></tbody></table></figure><p>接着修改 NFS 配置文件  <code>/etc/exports</code> ，配置像哪些主机共享自己的文件目录。</p>
+<p>使用  <code>vim</code>  命令进入配置文件，然后添加如下内容：</p>
+<figure class="highlight ini"><figcaption data-lang="ini"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>/share 192.168.1.0/24(rw,sync,insecure,no_subtree_check,no_root_squash)</pre></td></tr></tbody></table></figure><p>该配置中第一个字段就是服务端需要被共享的文件的绝对路径，之后  <code>192.168.1.0/24</code>  表明哪些 IP 区间的主机可以使用共享目录。括号里的字段是对共享文件管理的参数配置，详细可见下表（只列出了常用的一些配置）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">参数</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>ro</code></td>
+<td style="text-align:center">只读访问</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>rw</code></td>
+<td style="text-align:center">读写访问</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>sync</code></td>
+<td style="text-align:center">所有数据在请求时写入共享</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>async</code></td>
+<td style="text-align:center">nfs 在写入数据前可以响应请求</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>secure</code></td>
+<td style="text-align:center">nfs 通过 1024 以下的安全 TCP/IP 端口发送</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>insecure</code></td>
+<td style="text-align:center">nfs 通过 1024 以上的端口发送</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>wdelay</code></td>
+<td style="text-align:center">如果多个用户要写入 nfs 目录，则归组写入（默认）</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>no_wdelay</code></td>
+<td style="text-align:center">如果多个用户要写入 nfs 目录，则立即写入，当使用 async 时，无需此设置</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>hide</code></td>
+<td style="text-align:center">在 nfs 共享目录中不共享其子目录</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>no_hide</code></td>
+<td style="text-align:center">共享 nfs 目录的子目录</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>subtree_check</code></td>
+<td style="text-align:center">如果共享 /usr/bin 之类的子目录时，强制 nfs 检查父目录的权限（默认）</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>no_subtree_check</code></td>
+<td style="text-align:center">不检查父目录权限</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>root_squash</code></td>
+<td style="text-align:center">root 用户的所有请求映射成如 anonymous 用户一样的权限（默认）</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>no_root_squash</code></td>
+<td style="text-align:center">root 用户具有根目录的完全管理访问权限</td>
+</tr>
+</tbody>
+</table>
+<p>接着依次执行如下命令，启动 NFS 服务端功能：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">service</span> rpcbind start  <span class="token comment"># 启动 RPC 服务</span></pre></td></tr><tr><td data-num="2"></td><td><pre><span class="token function">service</span> nfs start      <span class="token comment"># 启动 NFS 服务</span></pre></td></tr></tbody></table></figure><p>可以使用如下命令检查是否启用了对 NFS 的端口映射列表：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>rpcinfo <span class="token parameter variable">-p</span> localhost</pre></td></tr></tbody></table></figure><p>接着执行下述命令查看服务端是否正确加载了  <code>/etc/exports</code>  配置：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>$ showmount <span class="token parameter variable">-e</span> localhost</pre></td></tr><tr><td data-num="2"></td><td><pre>/share <span class="token number">192.168</span>.1.10/24</pre></td></tr></tbody></table></figure><p>看到正确输出共享目录信息后则表明服务端已经配置完成，接下来继续配置 NFS 客户端。</p>
+<p>在客户端机器上执行如下命令测试共享目录是否可用：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>showmount <span class="token parameter variable">-e</span> 服务端ip</pre></td></tr></tbody></table></figure><p>如果正确输出共享目录的信息，就可以继续下一步：挂载共享目录到本地目录（这里是  <code>/mnt/nfsmount</code> ）。</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">mount</span> 服务端ip:/share /mnt/nfsmount</pre></td></tr><tr><td data-num="2"></td><td><pre><span class="token function">df</span> <span class="token parameter variable">-h</span></pre></td></tr></tbody></table></figure><p>至此，可以看到，已经正确地将远端 NFS 共享目录（ <code>/share</code> ）挂载到本地（ <code>/mnt/nfsmount</code> ）上了。</p>
+<p>最后别忘了实现自动化挂载，方法同第二节相同，其中 Device 写成  <code>服务器ip:/share</code> ，文件系统格式一般为  <code>nfs</code> ，比如：</p>
+<figure class="highlight ini"><figcaption data-lang="ini"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>192.168.1.100:/share  /mnt/nfsmount  nfs  defaults  0 0</pre></td></tr></tbody></table></figure><h3 id="cifs-配置"><a class="anchor" href="#cifs-配置">#</a> CIFS 配置</h3>
+<p>在 Linux 系统下配置 CIFS 需要使用 Samba 服务。Samba 是在 Linux 系统上实现 SMB 协议的一个免费软件，以实现文件共享和打印机服务共享。</p>
+<p>首先用下面命令确认一下当前系统是否安装了 Samba，使用命令：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">rpm</span> <span class="token parameter variable">-qa</span> <span class="token operator">|</span> <span class="token function">grep</span> samba</pre></td></tr></tbody></table></figure><p>其中，samba、samba-common、samba-client 三个程序是必须的。</p>
+<p>如果没有，则需要安装：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>yum <span class="token function">install</span> <span class="token parameter variable">-y</span> samba</pre></td></tr></tbody></table></figure><p>接着需要添加用于 Samba 服务的用户，该用户必须已经在系统中存在。也可以现在创建一个新的用户，比如命名为  <code>smbuser</code> 。使用到的命令如下：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">useradd</span> smbuser</pre></td></tr><tr><td data-num="2"></td><td><pre>smbpasswd <span class="token parameter variable">-a</span> smbuser</pre></td></tr></tbody></table></figure><p>接着按照提示为 Samba 用户设置密码，该用户将用于登录 Samba 服务器。之后修改配置文件  <code>/etc/samba/smb.conf</code> ，在文件最后添加如下内容：</p>
+<figure class="highlight ini"><figcaption data-lang="ini"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">share</span><span class="token punctuation">]</span></span></pre></td></tr><tr><td data-num="2"></td><td><pre>	<span class="token key attr-name">comment</span> <span class="token punctuation">=</span> <span class="token value attr-value">samba share folder</span></pre></td></tr><tr><td data-num="3"></td><td><pre>	<span class="token key attr-name">browseable</span> <span class="token punctuation">=</span> <span class="token value attr-value">yes</span></pre></td></tr><tr><td data-num="4"></td><td><pre>	<span class="token key attr-name">path</span> <span class="token punctuation">=</span> <span class="token value attr-value">/share</span></pre></td></tr><tr><td data-num="5"></td><td><pre>	<span class="token key attr-name">create mask</span> <span class="token punctuation">=</span> <span class="token value attr-value">0700</span></pre></td></tr><tr><td data-num="6"></td><td><pre>	<span class="token key attr-name">directory mask</span> <span class="token punctuation">=</span> <span class="token value attr-value">0700</span></pre></td></tr><tr><td data-num="7"></td><td><pre>	<span class="token key attr-name">valid users</span> <span class="token punctuation">=</span> <span class="token value attr-value">smbuser</span></pre></td></tr><tr><td data-num="8"></td><td><pre>	<span class="token key attr-name">force user</span> <span class="token punctuation">=</span> <span class="token value attr-value">smbuser</span></pre></td></tr><tr><td data-num="9"></td><td><pre>	<span class="token key attr-name">force group</span> <span class="token punctuation">=</span> <span class="token value attr-value">smbuser</span></pre></td></tr><tr><td data-num="10"></td><td><pre>	<span class="token key attr-name">public</span> <span class="token punctuation">=</span> <span class="token value attr-value">yes</span></pre></td></tr><tr><td data-num="11"></td><td><pre>	<span class="token key attr-name">available</span> <span class="token punctuation">=</span> <span class="token value attr-value">yes</span></pre></td></tr><tr><td data-num="12"></td><td><pre>	<span class="token key attr-name">writable</span> <span class="token punctuation">=</span> <span class="token value attr-value">yes</span></pre></td></tr></tbody></table></figure><p>其中方括号内是给共享目录起的别名， <code>path</code>  是共享目录的绝对路径。</p>
+<p>配置完后重启 / 启动 Samba 服务，命令如下：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">service</span> smbd restart  <span class="token comment"># 重启</span></pre></td></tr><tr><td data-num="2"></td><td><pre><span class="token function">service</span> smbd start    <span class="token comment"># 启动</span></pre></td></tr></tbody></table></figure><p>此时服务端的配置基本已经完成。不出意外，到这一步已经可以用 windows 设备访问该服务端的共享目录了。由于我做的是 Linux 客户端，这部分内容详见参考资料，此处不再记录。</p>
+<p>接着为客户端进行配置。</p>
+<p>客户端需要安装 smbclient，安装后测试访问 Samba 共享目录是否可用。</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">sudo</span> yum <span class="token function">install</span> samba-client</pre></td></tr><tr><td data-num="2"></td><td><pre>smbclient //服务端ip/share_name <span class="token parameter variable">-U</span> username</pre></td></tr></tbody></table></figure><p>** 这里注意  <code>share_name</code>  是  <code>smb.conf</code>  配置文件中方括号里起的别名。** 如果看到如下提示符，就证明共享目录可以正常工作：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>smb: <span class="token punctuation">\</span><span class="token operator">&gt;</span></pre></td></tr></tbody></table></figure><p>接着需要将共享目录挂在到本地（此处为  <code>/mnt/smbmount</code> ），需要用到软件包 cifs-utils，使用如下命令可以下载：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">sudo</span> yum <span class="token function">install</span> cifs-utils</pre></td></tr></tbody></table></figure><p>挂载共享目录用到如下命令：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token function">sudo</span> <span class="token function">mount</span> <span class="token parameter variable">-t</span> cifs //服务端ip/share /mnt/smbmount <span class="token parameter variable">-o</span> <span class="token assign-left variable">username</span><span class="token operator">=</span>smbuser,password<span class="token operator">=</span>   <span class="token comment"># 我没设置 smbuser 密码</span></pre></td></tr></tbody></table></figure><p>此处我执行该命令的时候报了 Unable to apply new capability set 的错误，通过查阅资料发现是 cifs-utils 版本的问题。我用 yum 下载的版本为 6.10，需要手动升级版本，经查阅资料 6.15 版本可以解决该报错。其源码仓库位于 <a target="_blank" rel="noopener" href="https://github.com/piastry/cifs-utils/tree/cifs-utils-6.15">https://github.com/piastry/cifs-utils/tree/cifs-utils-6.15</a> 。依据提示，下载源码到客户端，进入顶级目录，依次执行如下命令：</p>
+<figure class="highlight bash"><figcaption data-lang="bash"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre>autoreconf <span class="token parameter variable">-i</span></pre></td></tr><tr><td data-num="2"></td><td><pre>./configure</pre></td></tr><tr><td data-num="3"></td><td><pre><span class="token function">make</span></pre></td></tr><tr><td data-num="4"></td><td><pre><span class="token function">make</span> <span class="token function">install</span></pre></td></tr></tbody></table></figure><p>之后再次运行挂载命令就成功了。可以使用  <code>df -h</code>  或  <code>mount</code>  命令检测是否已经将服务端共享目录挂在到本地。</p>
+<p>最后一步别忘了做持久化挂载，往  <code>/etc/fstab</code>  添加如下内容：</p>
+<figure class="highlight ini"><figcaption data-lang="ini"></figcaption><table><tbody><tr><td data-num="1"></td><td><pre><span class="token key attr-name">//服务端ip/share /mnt/smbmount cifs username</span><span class="token punctuation">=</span><span class="token value attr-value">smbuser,password=,defaults 0 0</span></pre></td></tr></tbody></table></figure><br> 
+<h2 id="参考资料"><a class="anchor" href="#参考资料">#</a> 参考资料</h2>
+<p><a target="_blank" rel="noopener" href="https://aws.amazon.com/cn/compare/the-difference-between-nfs-and-cifs/">NFS 与 CIFS - 文件系统之间的区别 - AWS (amazon.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/piaoranyuji/article/details/113740221">Linux 查看磁盘、挂载磁盘、磁盘大小等常用操作</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38633110/article/details/114259253">Linux 挂载硬盘</a></p>
+<p><a target="_blank" rel="noopener" href="https://cn.linux-console.net/?p=23143">Linux 上的 Yum 和 Apt 指南 (linux-console.net)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/aixiaoyang168/article/details/83782336">Linux 环境下 NFS 服务安装及配置使用</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zgt_certificate/article/details/140219339">一步一步教你在 Ubuntu 上安装 NFS</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_38410730/article/details/80500920">Samba 服务器超详细安装、配置</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44078824/article/details/119847027">【详细步骤】Ubuntu 安装 Samba 服务及配置共享文件夹</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_6043682/5785156">Linux 使用及配置 Samba 客户端访问 Samba 服务器</a></p>
+</div><footer><div class="meta"><span class="item"><span class="icon"><i class="ic i-eye"></i></span><span class="text">总访问量：</span><span class="waline-pageview-count" id="twikoo_visitors" data-path="/learning-note/server-configuration/linux-nfs-cifs/">加载中...</span></span><span class="item"><span class="icon"><i class="ic i-calendar-check"></i></span><span class="text">更新于 </span><time title="修改时间：2025-05-13 22:02:40" itemprop="dateModified" datetime="2025-05-13T22:02:40+08:00">2025-05-13</time></span></div><div id="copyright"><ul><li class="author"><strong>本文作者：</strong>Jongsh<i class="ic i-at"><em>@</em></i>穷拾の小屋</li><li class="link"><strong>本文链接：</strong><a href="https://blog.jongsh.top/learning-note/server-configuration/linux-nfs-cifs/" title="Linux 环境配置 NFS 与 CIFS">https://blog.jongsh.top/learning-note/server-configuration/linux-nfs-cifs/</a></li><li class="license"><strong>版权声明：</strong>本站所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"><i class="ic i-creative-commons"><em>(CC)</em></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li></ul></div></footer></article></div><div class="post-nav"><div class="item left"><a href="/blog-site/image-hosting-tips/" rel="prev" itemprop="url" data-background-image="https://jongsh.oss-cn-beijing.aliyuncs.com/blog/cover/202409060938161.png?x-oss-process=image/format,webp" title="图床那点事"><span class="type">上一篇</span><span class="category"><i class="ic i-flag"></i>博客网站</span><h3>图床那点事</h3></a></div><div class="item right"><a href="/coding-diary/weibo-poi-crawler/" rel="next" itemprop="url" data-background-image="https://jongsh.oss-cn-beijing.aliyuncs.com/blog/cover/202409060937840.png?x-oss-process=image/format,webp" title="微博 POI 数据爬取"><span class="type">下一篇</span><span class="category"><i class="ic i-flag"></i>编程日常</span><h3>微博 POI 数据爬取</h3></a></div></div><div class="wrap" id="comments"></div></div><div id="sidebar"><div class="inner"><div class="panels"><div class="inner"><div class="contents panel pjax" data-title="文章目录"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text"> 概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">2.</span> <span class="toc-text"> 准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nfscifs-%E9%85%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text"> NFS/CIFS 配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#nfs-%E9%85%8D%E7%BD%AE"><span class="toc-number">3.1.</span> <span class="toc-text"> NFS 配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cifs-%E9%85%8D%E7%BD%AE"><span class="toc-number">3.2.</span> <span class="toc-text"> CIFS 配置</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">4.</span> <span class="toc-text"> 参考资料</span></a></li></ol></div><div class="related panel pjax" data-title="系列文章"><ul><li class="active"><a href="/learning-note/server-configuration/linux-nfs-cifs/" rel="bookmark" title="Linux 环境配置 NFS 与 CIFS">Linux 环境配置 NFS 与 CIFS</a></li></ul></div><div class="overview panel" data-title="站点概览"><div class="author" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><img class="image lozaded" loading="lazy" decoding="async" itemprop="image" alt="Jongsh" src="/assets/avatar.avif"><p class="name" itemprop="name">Jongsh</p><div class="description" itemprop="description">Talk is cheap, show me the code!</div></div><nav class="state"><div class="item posts"><a href="/archives/"><span class="count">12</span><span class="name">文章</span></a></div><div class="item categories"><a href="/categories/"><span class="count">8</span><span class="name">分类</span></a></div></nav><div class="social"><a target="_blank" rel="noopener" href="https://github.com/jongsh" class="item github" title="https://github.com/jongsh"><i class="ic i-github"></i></a><a target="_blank" rel="noopener" href="https://gitee.com/jongsh" class="item gitee" title="https://gitee.com/jongsh"><i class="ic i-gitee"></i></a><a href="/cjh1967662798@outlook.com" class="item envelope" title="cjh1967662798@outlook.com"><i class="ic i-envelope"></i></a></div><div class="menu"><li class="item"><a href="/" rel="section"><i class="ic i-home"></i>首页</a></li><li class="item dropdown"><a href="#" onclick="return false;"><i class="ic i-feather"></i>文章</a><ul class="submenu"><li class="item"><a href="/archives/" rel="section"><i class="ic i-list-alt"></i>归档</a></li><li class="item"><a href="/categories/" rel="section"><i class="ic i-th"></i>分类</a></li><li class="item"><a href="/tags/" rel="section"><i class="ic i-tags"></i>标签</a></li></ul></li><li class="item"><a href="/friends/" rel="section"><i class="ic i-heart"></i>友链</a></li></div></div></div></div><ul id="quick"><li class="prev pjax"><a href="/coding-diary/weibo-poi-crawler/" rel="prev" title="上一篇"><i class="ic i-chevron-left"></i></a></li><li class="up"><i class="ic i-arrow-up"></i></li><li class="down"><i class="ic i-arrow-down"></i></li><li class="next pjax"><a href="/blog-site/image-hosting-tips/" rel="next" title="下一篇"><i class="ic i-chevron-right"></i></a></li><li class="percent"></li></ul></div></div><div class="dimmer"></div></div><div id="player"></div></main></div><footer id="footer"><div class="inner"><div class="widgets"><div class="rpost pjax"><h2>随机文章</h2><ul><li class="item"><div class="breadcrumb"><a href="/categories/stanford-cs336/" title="分类于斯坦福 CS336 课程">斯坦福 CS336 课程</a></div><span><a href="/stanford-cs336/bpe-tokenizer-algorithm/">BPE 分词器算法原理与实现</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/coding-diary/" title="分类于编程日常">编程日常</a></div><span><a href="/coding-diary/python-multiprocessing/">Python 多进程编程</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/coding-diary/" title="分类于编程日常">编程日常</a><i class="ic i-angle-right"></i><a href="/categories/coding-diary/pytorch-note/" title="分类于PyTorch 学习笔记">PyTorch 学习笔记</a></div><span><a href="/coding-diary/pytorch-note/pytorch-model-training-basics/">PyTorch 模型训练之基础篇</a></span></li><li class="item"><div class="breadcrumb"></div><span><a href="/announcement/">网站迁移完成</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/learning-note/" title="分类于学习笔记">学习笔记</a><i class="ic i-angle-right"></i><a href="/categories/learning-note/reinforcement-learning/" title="分类于强化学习">强化学习</a></div><span><a href="/learning-note/reinforcement-learning/reinforcement-learning-math/">强化学习的数学原理</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/blog-site/" title="分类于博客网站">博客网站</a></div><span><a href="/blog-site/hello-world/">世界，你好</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/blog-site/" title="分类于博客网站">博客网站</a></div><span><a href="/blog-site/image-hosting-tips/">图床那点事</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/coding-diary/" title="分类于编程日常">编程日常</a></div><span><a href="/coding-diary/weibo-poi-crawler/">微博 POI 数据爬取</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/coding-diary/" title="分类于编程日常">编程日常</a><i class="ic i-angle-right"></i><a href="/categories/coding-diary/pytorch-note/" title="分类于PyTorch 学习笔记">PyTorch 学习笔记</a></div><span><a href="/coding-diary/pytorch-note/pytorch-model-training-parallel/">PyTorch 模型训练之并行篇</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/blog-site/" title="分类于博客网站">博客网站</a></div><span><a href="/blog-site/cabin-building-record/">小屋搭建记录</a></span></li></ul></div><div class="rpost pjax"><h2>最新评论</h2><ul class="leancloud-recent-comment" id="new-comment"></ul></div></div><div class="status"><div class="copyright">© 2024 -<span itemprop="copyrightYear">2026</span><span class="with-love"><i class="ic i-sakura rotate"></i></span><span class="author" itemprop="copyrightHolder">Jongsh @ JONGSH'S BLOG</span></div><div class="count"><span class="post-meta-item-icon"><i class="ic i-chart-area"></i></span><span title="站点总字数">154k 字</span><span class="post-meta-divider"> | </span><span class="post-meta-item-icon"><i class="ic i-coffee"></i></span><span title="站点阅读时长">2:20</span></div><div class="powered-by">基于 <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> &amp; Theme.<a target="_blank" rel="noopener" href="https://github.com/theme-shoka-x/hexo-theme-shokaX/">ShokaX</a></div></div></div></footer></div><script data-config="" type="text/javascript">var LOCAL = {
+    ispost: true,
+    path: `learning-note/server-configuration/linux-nfs-cifs/`,
+    favicon: {
+        show: `(๑◔‿◔๑)被我骗了吧~`,
+        hide: `(×_×) 404网站未响应`
+    },
+    search: {
+        placeholder: "文章搜索",
+        empty: "关于 「 ${query} 」，什么也没搜到",
+        stats: "${time} ms 内找到 ${hits} 条结果"
+    },
+    nocopy: "false",
+    copyright: `复制成功，转载请遵守 <i class="ic i-creative-commons"></i>BY-NC-SA 协议。`,
+    copy_tex: false,
+    katex: false,
+    mermaid: false,
+    audio: undefined,
+    fancybox: true,
+    nocopy: false,
+    outime: true,
+    template: `<div class="note warning"><p><span class="label warning">文章时效性提示</span><br>这是一篇发布于 {{publish}} 天前，最后一次更新在 {{updated}} 天前的文章，部分信息可能已经发生改变，请注意甄别。</p></div>`,
+    quiz: {
+        choice: `单选题`,
+        multiple: `多选题`,
+        true_false: `判断题`,
+        essay: `问答题`,
+        gap_fill: `填空题`,
+        mistake: `错题备注`
+    },
+    ignores: [
+        (uri) => uri.includes('#'),
+        (uri) => new RegExp(LOCAL.path + '$').test(uri),
+            []
+    ]
+};
+</script><script src="https://s4.zstatic.net/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha384-Zm+UU4tdcfAm29vg+MTbfu//q5B/lInMbMCr4T8c9rQFyOv6PlfQYpB5wItcXWe7" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js" integrity="sha384-TOxsBplaL96/QDWPIUg+ye3v89qSE3s22XNtJMmCeZEep3cVDmXy1zEfZvVv+y2m" crossorigin="anonymous" fetchpriority="high"></script><script src="/js/siteInit.js?v=0.4.25" type="module" fetchpriority="high" defer=""></script></body></html>
