@@ -746,9 +746,9 @@ PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)
         <updated>2025-11-10T03:04:38.000Z</updated>
     </entry>
     <entry>
-        <id>https://blog.jongsh.top/coding-diary/pytorch-note/pytorch-model-training-parallel/</id>
+        <id>https://blog.jongsh.top/pytorch-notes/training-engineering/pytorch-model-training-parallel/</id>
         <title>PyTorch 模型训练之并行篇</title>
-        <link rel="alternate" href="https://blog.jongsh.top/coding-diary/pytorch-note/pytorch-model-training-parallel/"/>
+        <link rel="alternate" href="https://blog.jongsh.top/pytorch-notes/training-engineering/pytorch-model-training-parallel/"/>
         <content type="html">&lt;p&gt;现如今，深度学习模型的规模和复杂度正以前所未有的速度增长，从简单的线性模型到如今动辄数百数千亿参数的大模型，单 GPU 的计算能力已难以满足高效训练的需求。并行训练技术应运而生，它合理分配计算任务到多个 GPU 或多台机器上，显著提升了训练效率。本文将介绍 PyTorch 中几种常见的并行训练方法，包括数据并行（Data Parallel）、分布式数据并行（Distributed Data Parallel，DDP）、Hugging Face 的 Accelerate 工具库等。通过对比和代码示例，帮助读者快速掌握这些技术的原理和使用方法。&lt;/p&gt;
 &lt;h2 id=&#34;前期准备&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#前期准备&#34;&gt;#&lt;/a&gt; 前期准备&lt;/h2&gt;
 &lt;p&gt;为了演示不同的并行训练方案，首先需要准备对应的训练数据和模型。由于现在不需要关注模型的准确率等指标，因此我们可以使用随机数据来进行训练。&lt;/p&gt;
@@ -920,14 +920,14 @@ PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)
 &lt;figure class=&#34;highlight python&#34;&gt;&lt;figcaption data-lang=&#34;python&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token comment&#34;&gt;# all_gather 每个 GPU 收到完整数据列表&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;tensor_list &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt;torch&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;zeros_like&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;tensor&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;for&lt;/span&gt; _ &lt;span class=&#34;token keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;token builtin&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;world_size&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;dist&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;all_gather&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;tensor_list&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; tensor&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;&lt;strong&gt;gather&lt;/strong&gt;：所有进程发送数据到目标进程，只有它接收。&lt;/p&gt;
 &lt;figure class=&#34;highlight python&#34;&gt;&lt;figcaption data-lang=&#34;python&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token comment&#34;&gt;# gather 只有 rank0 收到&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;if&lt;/span&gt; rank &lt;span class=&#34;token operator&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;:&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    gather_list &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;[&lt;/span&gt;torch&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;zeros_like&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;tensor&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;for&lt;/span&gt; _ &lt;span class=&#34;token keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;token builtin&#34;&gt;range&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;world_size&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;]&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;else&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;:&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;    gather_list &lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;token boolean&#34;&gt;None&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;dist&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;gather&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;tensor&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; gather_list&lt;span class=&#34;token punctuation&#34;&gt;,&lt;/span&gt; dst&lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;token number&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;&lt;strong&gt;barrier&lt;/strong&gt;：等待所有进程都执行到此位置。&lt;/p&gt;
 &lt;figure class=&#34;highlight python&#34;&gt;&lt;figcaption data-lang=&#34;python&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;dist&lt;span class=&#34;token punctuation&#34;&gt;.&lt;/span&gt;barrier&lt;span class=&#34;token punctuation&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;token punctuation&#34;&gt;)&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;</content>
-        <category term="编程日常" scheme="https://blog.jongsh.top/categories/coding-diary/" />
-        <category term="PyTorch 学习笔记" scheme="https://blog.jongsh.top/categories/coding-diary/pytorch-note/" />
+        <category term="PyTorch 学习笔记" scheme="https://blog.jongsh.top/categories/pytorch-notes/" />
+        <category term="训练工程" scheme="https://blog.jongsh.top/categories/pytorch-notes/training-engineering/" />
         <updated>2025-09-22T12:15:12.000Z</updated>
     </entry>
     <entry>
-        <id>https://blog.jongsh.top/learning-note/reinforcement-learning/reinforcement-learning-math/</id>
+        <id>https://blog.jongsh.top/reinforcement-learning/reinforcement-learning-math/</id>
         <title>强化学习的数学原理</title>
-        <link rel="alternate" href="https://blog.jongsh.top/learning-note/reinforcement-learning/reinforcement-learning-math/"/>
+        <link rel="alternate" href="https://blog.jongsh.top/reinforcement-learning/reinforcement-learning-math/"/>
         <content type="html">&lt;p&gt;强化学习（Reinforcement Learning, RL）是机器学习的核心范式之一，其核心目标是通过智能体与环境的动态交互，自主习得最优决策策略，以最大化长期累积奖励。&lt;/p&gt;
 &lt;p&gt;本文系统梳理了强化学习算法的相关数学原理，希望能对强化学习的理解有所帮助。同时，本文省略了部分基础知识的介绍，把重点放在强化学习经典算法和数学理解上，对复杂的证明和推导予以省略。&lt;/p&gt;
 &lt;h2 id=&#34;基础概念&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#基础概念&#34;&gt;#&lt;/a&gt; 基础概念&lt;/h2&gt;
@@ -2003,8 +2003,7 @@ J(\theta) = \bar{r}_{\mu} &amp;amp;= \sum_{s \in \mathcal{S}} d_{\mu}(s) r_{\mu}
 &lt;h2 id=&#34;参考资料&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#参考资料&#34;&gt;#&lt;/a&gt; 参考资料&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&#34;https://www.bilibili.com/video/BV1sd4y167NS/&#34;&gt;【强化学习的数学原理】课程：从零开始到透彻理解 哔哩哔哩&lt;/a&gt;&lt;/p&gt;
 </content>
-        <category term="学习笔记" scheme="https://blog.jongsh.top/categories/learning-note/" />
-        <category term="强化学习" scheme="https://blog.jongsh.top/categories/learning-note/reinforcement-learning/" />
+        <category term="强化学习" scheme="https://blog.jongsh.top/categories/reinforcement-learning/" />
         <updated>2025-04-17T03:28:09.000Z</updated>
     </entry>
     <entry>
@@ -2431,9 +2430,9 @@ J(\theta) = \bar{r}_{\mu} &amp;amp;= \sum_{s \in \mathcal{S}} d_{\mu}(s) r_{\mu}
         <updated>2025-03-09T01:57:19.000Z</updated>
     </entry>
     <entry>
-        <id>https://blog.jongsh.top/coding-diary/pytorch-note/pytorch-model-training-basics/</id>
+        <id>https://blog.jongsh.top/pytorch-notes/training-engineering/pytorch-model-training-basics/</id>
         <title>PyTorch 模型训练之基础篇</title>
-        <link rel="alternate" href="https://blog.jongsh.top/coding-diary/pytorch-note/pytorch-model-training-basics/"/>
+        <link rel="alternate" href="https://blog.jongsh.top/pytorch-notes/training-engineering/pytorch-model-training-basics/"/>
         <content type="html">&lt;h2 id=&#34;前言&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#前言&#34;&gt;#&lt;/a&gt; 前言&lt;/h2&gt;
 &lt;p&gt;想来已经很久没有写博客了，趁着春节假期刚结束，我一时兴起，决定利用 DeepSeek 水一篇博客，既为之后的学习做个记录，也为眼前的毕业设计留下一些痕迹。&lt;/p&gt;
 &lt;p&gt;这篇博客的主题是《深度学习模型训练代码》，顾名思义，主要讨论如何编写深度学习中的  &lt;code&gt;train.py&lt;/code&gt;  文件。相信写过训练代码的人都知道， &lt;code&gt;train.py&lt;/code&gt;  的基本逻辑大致相同：加载数据集、调用模型、计算损失、梯度优化、保存结果等。虽然听起来简单，但要写出一份既优雅整洁又功能完备的代码，还是需要费些功夫。既然如此，不如直接把这个框架搭建好，以后只要依葫芦画瓢，稍作调整即可。&lt;/p&gt;
@@ -2499,14 +2498,14 @@ J(\theta) = \bar{r}_{\mu} &amp;amp;= \sum_{s \in \mathcal{S}} d_{\mu}(s) r_{\mu}
 &lt;figure class=&#34;highlight bash&#34;&gt;&lt;figcaption data-lang=&#34;bash&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;tensorboard &lt;span class=&#34;token parameter variable&#34;&gt;--logdir&lt;/span&gt;&lt;span class=&#34;token operator&#34;&gt;=&lt;/span&gt;./logs/tensorboard&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;然后在浏览器中访问  &lt;code&gt;http://localhost:6006&lt;/code&gt; ，即可查看训练和验证的损失、准确率等指标。&lt;/p&gt;
 &lt;p&gt;运行脚本后，生成的文件结构如下：&lt;/p&gt;
 &lt;figure class=&#34;highlight bash&#34;&gt;&lt;figcaption data-lang=&#34;bash&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;./&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;├── logs/&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;3&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;│   ├── train_20231025_153000.log  &lt;span class=&#34;token comment&#34;&gt;# 训练日志&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;4&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;│   └── tensorboard/               &lt;span class=&#34;token comment&#34;&gt;# TensorBoard 日志&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;5&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;├── checkpoints/&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;6&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;│   ├── model_epoch_5.pt           &lt;span class=&#34;token comment&#34;&gt;# 模型检查点&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;7&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;│   └── model_epoch_10.pt&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;8&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;└── config.json                    &lt;span class=&#34;token comment&#34;&gt;# 配置文件&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;</content>
-        <category term="编程日常" scheme="https://blog.jongsh.top/categories/coding-diary/" />
-        <category term="PyTorch 学习笔记" scheme="https://blog.jongsh.top/categories/coding-diary/pytorch-note/" />
+        <category term="PyTorch 学习笔记" scheme="https://blog.jongsh.top/categories/pytorch-notes/" />
+        <category term="训练工程" scheme="https://blog.jongsh.top/categories/pytorch-notes/training-engineering/" />
         <updated>2025-02-11T12:22:36.000Z</updated>
     </entry>
     <entry>
-        <id>https://blog.jongsh.top/learning-note/frontend-development/vue3-project-build-guide/</id>
+        <id>https://blog.jongsh.top/frontend-development/vue3-project-build-guide/</id>
         <title>Vue3 项目构建指南</title>
-        <link rel="alternate" href="https://blog.jongsh.top/learning-note/frontend-development/vue3-project-build-guide/"/>
+        <link rel="alternate" href="https://blog.jongsh.top/frontend-development/vue3-project-build-guide/"/>
         <content type="html">&lt;blockquote&gt;
 &lt;p&gt;在前端开发领域，Vue 框架无疑是一个重要的角色。然而，每次创建和初始化 Vue 项目时，我总是要一边查阅文档和浏览器一边配置。这主要是因为为了完整地初始化一个 Vue 项目，往往需要考虑其他组件的使用和配置等细节。因此，我写下这篇博客，主要是依据我个人的开发习惯，整理了 Vue3 项目的构建和配置流程，望一劳永逸～&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -2581,8 +2580,7 @@ J(\theta) = \bar{r}_{\mu} &amp;amp;= \sum_{s \in \mathcal{S}} d_{\mu}(s) r_{\mu}
 &lt;p&gt;如果使用  &lt;code&gt;unplugin-element-plus&lt;/code&gt;  并且只使用组件 API，则需要手动导入样式。&lt;/p&gt;
 &lt;figure class=&#34;highlight js&#34;&gt;&lt;figcaption data-lang=&#34;JavaScript&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#39;element-plus/es/components/message/style/css&#39;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;&lt;span class=&#34;token keyword&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;token punctuation&#34;&gt;&amp;#123;&lt;/span&gt; ElMessage &lt;span class=&#34;token punctuation&#34;&gt;&amp;#125;&lt;/span&gt; &lt;span class=&#34;token keyword&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;token string&#34;&gt;&#39;element-plus&#39;&lt;/span&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/div&gt;
 </content>
-        <category term="学习笔记" scheme="https://blog.jongsh.top/categories/learning-note/" />
-        <category term="前端开发" scheme="https://blog.jongsh.top/categories/learning-note/frontend-development/" />
+        <category term="前端开发" scheme="https://blog.jongsh.top/categories/frontend-development/" />
         <updated>2024-09-17T05:14:06.000Z</updated>
     </entry>
     <entry>
@@ -2700,9 +2698,9 @@ J(\theta) = \bar{r}_{\mu} &amp;amp;= \sum_{s \in \mathcal{S}} d_{\mu}(s) r_{\mu}
         <updated>2024-07-28T05:18:50.000Z</updated>
     </entry>
     <entry>
-        <id>https://blog.jongsh.top/learning-note/server-configuration/linux-nfs-cifs/</id>
+        <id>https://blog.jongsh.top/server-configuration/linux-nfs-cifs/</id>
         <title>Linux 环境配置 NFS 与 CIFS</title>
-        <link rel="alternate" href="https://blog.jongsh.top/learning-note/server-configuration/linux-nfs-cifs/"/>
+        <link rel="alternate" href="https://blog.jongsh.top/server-configuration/linux-nfs-cifs/"/>
         <content type="html">&lt;p&gt;暑期实习两周，负责老师终于给我派了任务。闲来无事，遂写下这篇博客记录所学内容和踩过的坑。&lt;/p&gt;
 &lt;h2 id=&#34;概述&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#概述&#34;&gt;#&lt;/a&gt; 概述&lt;/h2&gt;
 &lt;p&gt;网络文件系统（NFS）最早是由 Sun 公司发展出来的，也是 FreeBSD 支持的文件系统中的一个，它允许网络中的计算机之间通过 TCP/IP 网络共享资源。通过 NFS，我们本地 NFS 的客户端应用可以透明地读写位于服务端 NFS 服务器上的文件，就像访问本地文件一样方便。简单的理解，NFS 就是可以透过网络，让不同的主机、不同的操作系统可以共享存储的服务。&lt;/p&gt;
@@ -2901,8 +2899,7 @@ J(\theta) = \bar{r}_{\mu} &amp;amp;= \sum_{s \in \mathcal{S}} d_{\mu}(s) r_{\mu}
 &lt;p&gt;&lt;a href=&#34;https://blog.csdn.net/qq_44078824/article/details/119847027&#34;&gt;【详细步骤】Ubuntu 安装 Samba 服务及配置共享文件夹&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;https://blog.51cto.com/u_6043682/5785156&#34;&gt;Linux 使用及配置 Samba 客户端访问 Samba 服务器&lt;/a&gt;&lt;/p&gt;
 </content>
-        <category term="学习笔记" scheme="https://blog.jongsh.top/categories/learning-note/" />
-        <category term="服务器配置" scheme="https://blog.jongsh.top/categories/learning-note/server-configuration/" />
+        <category term="服务器配置" scheme="https://blog.jongsh.top/categories/server-configuration/" />
         <updated>2024-07-16T02:01:28.000Z</updated>
     </entry>
     <entry>
